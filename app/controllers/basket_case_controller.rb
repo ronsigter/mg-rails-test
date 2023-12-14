@@ -1,18 +1,16 @@
 class BasketCaseController < ApplicationController
+  before_action :set_sort_and_order
   before_action :set_fruits
   before_action :set_items
 
-  def index; end
+  NAME = "name"
+  AMOUNT = "amount"
+  ASC = "asc"
+  DESC = "desc"
 
-  def order_by_fruit
-    @list_items = @list_items.sort
-    @list_items = @list_items.reverse if params.has_key?(:order) && params[:order] == "desc"
-    render 'basket_case/index'
-  end
-
-  def order_by_amount
-    # code here
-
+  def index
+    @list_items = @list_items.sort_by { |name, amount| eval(@sort) }
+    @list_items.reverse! if @order === DESC
     render 'basket_case/index'
   end
 
@@ -28,5 +26,10 @@ class BasketCaseController < ApplicationController
 
     def set_items
       @list_items = @fruits
+    end
+
+    def set_sort_and_order
+      @sort = params[:sort].in?([NAME, AMOUNT]) ? params[:sort] : NAME
+      @order = params[:order].in?([ASC, DESC]) ? params[:order] : ASC
     end
 end
